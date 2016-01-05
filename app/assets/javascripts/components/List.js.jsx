@@ -1,9 +1,21 @@
 var List = React.createClass({
+  // this function sets up the basic format.
   getInitialState: function() {
-    return { items: this.props.items };
-  },
-  getDefaultState: function() {
     return { items: []};
+  },
+  componentDidMount: function(){
+    this.refreshList()
+  },
+  // This function goes and grabs all the stuff we need from the DB
+  refreshList: function(){
+    var self = this;
+    $.ajax({
+      url: '/items',
+      type: 'GET',
+      success: function(data) {
+        self.setState({items: data})
+      }
+    });
   },
 
   showAddForm: function() {
@@ -32,7 +44,7 @@ var List = React.createClass({
       data: {item: {name: this.state.itemName}},
       success: function(data) {
         var items = self.state.items;
-        items.push({name: data.name, complete: data.complete});
+        items.push(data);
         self.setState({items: items, showAdd: false, itemName: null});
       }
     });
@@ -44,18 +56,10 @@ var List = React.createClass({
 
   displayItems: function() {
     var items = [];
-    for(var i=0; i <this.state.items.length; i++){
-      items.push(<li>
-                  <div className='row'>
-                    <div className='col s10'>
-                      {this.state.items[i].name}
-                    </div>
-                    <div className='col s2'>
-                      <input type='checkbox' checked={this.state.items[i].complete} />
-                      <label>Complete?</label>
-                    </div>
-                  </div>
-                </li>);
+    for(var i=0; i < this.state.items.length; i++){
+      var item = this.state.items[i]
+      var key = "Item-" + item.id
+      items.push(<Item refreshList={this.refreshList} key={key} id={item.id} name={item.name} complete={item.complete} />)
     };
     return items;
   },
