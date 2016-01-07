@@ -12,8 +12,9 @@ var List = React.createClass({
     $.ajax({
       url: '/items',
       type: 'GET',
+      data: {list_id: this.props.id},
       success: function(data) {
-        self.setState({items: data})
+        self.setState({items: data.items})
       }
     });
   },
@@ -41,7 +42,7 @@ var List = React.createClass({
     $.ajax({
       url: '/items',
       type: 'POST',
-      data: {item: {name: this.state.itemName}},
+      data: {list_id: this.props.id, item: {name: this.state.itemName}},
       success: function(data) {
         var items = self.state.items;
         items.push(data);
@@ -59,21 +60,35 @@ var List = React.createClass({
     for(var i=0; i < this.state.items.length; i++){
       var item = this.state.items[i]
       var key = "Item-" + item.id
-      items.push(<Item refreshList={this.refreshList} key={key} id={item.id} name={item.name} complete={item.complete} />)
+      items.push(<Item refreshList={this.refreshList} listId={this.props.id} url={item.url} key={key} id={item.id} name={item.name} complete={item.complete} />)
     };
     return items;
   },
 
+  deleteList: function(){
+    var self = this;
+    $.ajax({
+      url: this.props.url,
+      type: 'DELETE',
+      success: function() {
+        self.props.fetchLists();
+      }
+    });
+  },
+
   render: function() {
     return(<div>
-            <a className='waves-effect waves-light btn' onClick={this.showAddForm}>Add Item</a>
-            {this.addItemForm()}
             <div className='card blue-grey darken-1'>
               <div className='card-content white-text'>
-                <span className='card-title'>To Do</span>
+                <div className="right">
+                  <button className='btn' onClick={this.deleteList}>Delete List</button>
+                </div>
+                <span className='card-title'>{this.props.name}</span>
                 <ul>
                   {this.displayItems()}
                 </ul>
+                <a className='waves-effect waves-light btn' onClick={this.showAddForm}>Add Item</a>
+                {this.addItemForm()}
               </div>
             </div>
           </div>);

@@ -12,7 +12,7 @@ var Item = React.createClass({
     $.ajax({
       url: '/check_item',
       type: 'PUT',
-      data: {item: {complete: !this.props.complete}, id: this.props.id},
+      data: {list_id: this.props.listId, item: {complete: !this.props.complete}, id: this.props.id},
       success: function() {
         self.props.refreshList();
       }
@@ -22,8 +22,9 @@ var Item = React.createClass({
   deleteItem: function() {
     var self = this;
     $.ajax({
-      url: '/items/' + this.props.id,
+      url: this.props.url,
       type: 'DELETE',
+      data: {list_id: this.props.listId},
       success: function() {
         self.props.refreshList();
       }
@@ -55,9 +56,9 @@ var Item = React.createClass({
     var name = ReactDOM.findDOMNode(this.refs.itemName).value;
     var self = this;
     $.ajax({
-      url: '/items/' + this.props.id,
+      url: this.props.url,
       type: 'PUT',
-      data: {item: {name: name}},
+      data: {list_id: this.props.listId, item: {name: name}},
       success: function() {
         self.setState({edit: false})
         self.props.refreshList();

@@ -11,16 +11,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160104165541) do
+ActiveRecord::Schema.define(version: 20160106174611) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "boards", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "items", force: :cascade do |t|
     t.string   "name"
     t.boolean  "complete"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "list_id"
   end
 
+  add_index "items", ["list_id"], name: "index_items_on_list_id", using: :btree
+
+  create_table "lists", force: :cascade do |t|
+    t.string   "name"
+    t.float    "percent_complete"
+    t.integer  "board_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "lists", ["board_id"], name: "index_lists_on_board_id", using: :btree
+
+  add_foreign_key "items", "lists"
+  add_foreign_key "lists", "boards"
 end
